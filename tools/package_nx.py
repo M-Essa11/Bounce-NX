@@ -53,7 +53,7 @@ def validate():
     return nro, {
         "nro_sha256": sha(nro), "nro_bytes": len(nro),
         "embedded_files_verified": len(embedded), "levels_verified": 11,
-        "nacp_title": "Bounce NX", "hardware_tested": False,
+        "nacp_title": "Bounce NX", "hardware_validation": "Gameplay tested on Switch Lite in v0.1.2; v1.00 changes release metadata only",
         "source_base": "M-Essa11/Bounce-Vita with Super-Matter's physics PR #1 (13e5705)",
         "asset_sha256": {name: sha(data) for name, data in sorted(embedded.items())},
     }
@@ -62,7 +62,7 @@ if __name__ == "__main__":
     nro, report = validate()
     dist = ROOT / "dist"
     dist.mkdir(exist_ok=True)
-    package = dist / "Bounce-NX-v0.1.2-test.zip"
+    package = dist / "Bounce-NX-v1.00.zip"
     report_text = json.dumps(report, indent=2) + "\n"
     (dist / "validation.json").write_text(report_text)
     with zipfile.ZipFile(package, "w", zipfile.ZIP_DEFLATED) as archive:

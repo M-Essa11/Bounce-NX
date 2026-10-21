@@ -47,7 +47,7 @@ int main(int argc, char **argv) {
     if (R_FAILED(rc)) { nx_log("RomFS init failed: %08x", rc); return 1; }
     appletSetFocusHandlingMode(AppletFocusHandlingMode_NoSuspend);
 #endif
-    nx_log("Bounce NX 0.1.2 starting");
+    nx_log("Bounce NX 1.00 starting");
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_TIMER) < 0) {
         nx_log("SDL init: %s", SDL_GetError());
 #ifdef __SWITCH__

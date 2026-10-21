@@ -47,7 +47,7 @@ Updating? Replace the NRO. Keep your `save.dat`.
 Saves are stored in `sd:/switch/bounce-nx/save.dat`. Continue keeps your level,
 score and lives. After closing the app, it restarts that level from the beginning.
 
-## v0.1.2 â€” ramp fixes
+## v1.00 â€” ramp fixes
 
 Added [Super-Matter's physics fixes](https://github.com/M-Essa11/Bounce-Vita/pull/1):
 
@@ -55,7 +55,7 @@ Added [Super-Matter's physics fixes](https://github.com/M-Essa11/Bounce-Vita/pul
 - Airborne impacts still bounce correctly off normal and rubber ramps.
 - Floor and ceiling collisions work correctly when gravity is reversed.
 
-v0.1.2 is working on my Switch Lite. The desktop physics regression tests also pass.
+Tested on my Switch Lite. The desktop physics regression tests also pass.
 
 This also includes the fullscreen menus, readable text, HD ball logo and new cover
 from the previous test build.

@@ -40,7 +40,7 @@ include $(DEVKITPRO)/libnx/switch_rules
 TARGET		:=	bounce-nx
 APP_TITLE := Bounce NX
 APP_AUTHOR := M-Essa11
-APP_VERSION := 0.1.2
+APP_VERSION := 1.00
 BUILD		:=	build-nx
 SOURCES		:=	src
 DATA		:=	data
