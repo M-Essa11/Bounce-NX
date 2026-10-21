@@ -3,7 +3,19 @@
 Bounce for Nintendo Switch, ported from [Bounce Vita](https://github.com/M-Essa11/Bounce-Vita).
 All 11 classic levels, updated artwork, sound effects, and saved progress.
 
-![Bounce](icons/nx/bounce-splash.png)
+## Screenshots
+
+### Gameplay
+
+![Bounce NX gameplay on Switch Lite](docs/screenshots/nx-gameplay.jpg)
+
+### Title screen
+
+![Bounce NX title screen](docs/screenshots/nx-title-screen.jpg)
+
+### Switch HOME menu
+
+![Bounce NX icon on the Switch HOME menu](docs/screenshots/nx-home-menu.jpg)
 
 ## Install
 
@@ -35,7 +47,7 @@ Updating? Replace the NRO. Keep your `save.dat`.
 Saves are stored in `sd:/switch/bounce-nx/save.dat`. Continue keeps your level,
 score and lives. After closing the app, it restarts that level from the beginning.
 
-## v0.1.2 — ramp fixes
+## v0.1.2 â€” ramp fixes
 
 Added [Super-Matter's physics fixes](https://github.com/M-Essa11/Bounce-Vita/pull/1):
 
@@ -43,8 +55,7 @@ Added [Super-Matter's physics fixes](https://github.com/M-Essa11/Bounce-Vita/pul
 - Airborne impacts still bounce correctly off normal and rubber ramps.
 - Floor and ceiling collisions work correctly when gravity is reversed.
 
-Menus, movement and sound have been tested on Switch Lite. The new physics changes
-pass the desktop regression tests and still need a run on the Switch.
+v0.1.2 is working on my Switch Lite. The desktop physics regression tests also pass.
 
 This also includes the fullscreen menus, readable text, HD ball logo and new cover
 from the previous test build.
@@ -70,11 +81,11 @@ The original Vita build instructions are in [README-Vita.md](README-Vita.md).
 
 ## Credits
 
-- Nokia / Sun Microsystems — original Bounce.
-- [amdray/bounce_zero](https://github.com/amdray/bounce_zero) — C reimplementation.
-- M-Essa11 — Vita and Switch ports, artwork and presentation updates.
-- [Super-Matter](https://github.com/Super-Matter) — ramp and reverse-gravity physics fixes.
-- devkitPro, libnx and SDL contributors — tools and libraries.
+- Nokia / Sun Microsystems â€” original Bounce.
+- [amdray/bounce_zero](https://github.com/amdray/bounce_zero) â€” C reimplementation.
+- M-Essa11 â€” Vita and Switch ports, artwork and presentation updates.
+- [Super-Matter](https://github.com/Super-Matter) â€” ramp and reverse-gravity physics fixes.
+- devkitPro, libnx and SDL contributors â€” tools and libraries.
 
 Source code: MIT. Original game names and assets belong to their respective owners.
 See [LICENSE](LICENSE) and [NOTICE.md](NOTICE.md).
