@@ -26,6 +26,9 @@ const char* local_text_settings(void) {
 }
 
 const char* local_text_press_start(void) {
+#ifdef BOUNCE_NX
+    return "Press +";
+#endif
     if (lang_is_prefix("ru")) {
         return "Нажмите START";
     }

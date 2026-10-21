@@ -13,3 +13,14 @@
 .DS_Store
 Thumbs.db
 
+
+/build-nx/
+/romfs-nx/
+/dist/
+/save-nx/
+/bounce-nx.log
+*.nro
+*.nacp
+*.elf
+*.map
+__pycache__/

@@ -3,7 +3,15 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
-#ifdef BOUNCE_VITA
+#ifdef BOUNCE_NX
+#include "types.h"
+#define LANGUAGE_OPEN util_open_file
+#else
+#define LANGUAGE_OPEN fopen
+#endif
+#ifdef BOUNCE_NX
+/* English is the initial NX language; all original language data is bundled. */
+#elif defined(BOUNCE_VITA)
 #include <psp2/system_param.h>
 #else
 #include <pspkernel.h>
@@ -22,7 +30,12 @@ static bool s_cache_initialized = false;
 // Определение языка PSP в соответствии с файлами
 static void detect_phone_language(void) {
     int language;
-#ifdef BOUNCE_VITA
+#ifdef BOUNCE_NX
+    language = 0;
+    static const struct { int lang_id; const char *code; } k_lang_map[] = {
+        {0, "xx"}
+    };
+#elif defined(BOUNCE_VITA)
     language = SCE_SYSTEM_PARAM_LANG_ENGLISH_US;
 
     static const struct {
@@ -81,10 +94,10 @@ static void initialize_string_cache(void) {
     snprintf(filename, sizeof(filename), "lang/lang.%s", s_phone_lang);
 
     // Пробуем открыть файл для нужного языка
-    FILE* file = fopen(filename, "rb");
+    FILE* file = LANGUAGE_OPEN(filename, "rb");
     if (!file) {
         // Если не найден, пробуем английский
-        file = fopen("lang/lang.xx", "rb");
+        file = LANGUAGE_OPEN("lang/lang.xx", "rb");
         if (!file) {
             // Заполняем ошибками и выходим
             for (int i = 0; i < MAX_STRING_ID; i++) {
@@ -180,6 +193,12 @@ static void initialize_string_cache(void) {
 
 // Основная функция получения текста (аналог Java getText)
 const char* local_get_text(int string_id) {
+#ifdef BOUNCE_NX
+    if (string_id == QHJ_BOUN_INSTRUCTIONS_PART_2)
+        return "Use the D-pad or left stick to move. Press A to jump or confirm, B to go back, + to pause, and - to save and exit. L/ZL and R/ZR also move left and right.";
+    if (string_id == QHJ_BOUN_INSTRUCTIONS_PART_4)
+        return "Use deflators to shrink the ball and inflators to return to normal size. Large balls float in water; small balls do not.";
+#endif
     // Инициализируем кэш при первом обращении
     initialize_string_cache();
 

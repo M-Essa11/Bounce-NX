@@ -121,7 +121,7 @@ Level g_level;
 // --- Вспомогательное: единожды загрузить атлас ---
 static void level_load_tileset_once(void) {
     if (s_tileset) return;
-#ifdef BOUNCE_VITA
+#if defined(BOUNCE_VITA) || defined(BOUNCE_NX)
     s_tileset = png_load_texture_vram(TILESET_HD_PATH);
     if (s_tileset) {
         if (s_tileset->actual_width == 192 && s_tileset->actual_height == 288) {

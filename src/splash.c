@@ -13,6 +13,11 @@
 static void draw_centered_splash(texture_t* tex) {
     if (!tex) return;
     graphics_begin_textured();
+#ifdef BOUNCE_NX
+    sprite_rect_t source = {0, 0, tex->actual_width, tex->actual_height};
+    png_draw_sprite(tex, &source, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+    return;
+#endif
 
     // Используем реальный размер изображения, а не размер текстуры GPU
     int real_width = tex->actual_width;
@@ -48,8 +53,13 @@ void splash_render_nokia(void) {
     graphics_clear(COLOR_TEXT_NORMAL);
     graphics_begin_plain();
     {
+#ifdef BOUNCE_NX
+        const char *title = "BOUNCE";
+        const char *name = "";
+#else
         const char *title = "GITHUB";
         const char *name = "github.com/M-Essa11";
+#endif
         int title_width = graphics_measure_text(title, 23);
         int name_width = graphics_measure_text(name, 12);
         graphics_draw_text((SCREEN_WIDTH - title_width) / 2, 105, title, COLOR_WHITE_ABGR, 23);

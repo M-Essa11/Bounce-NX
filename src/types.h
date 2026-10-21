@@ -84,7 +84,11 @@ typedef enum {
 
 // Splash экраны (соответствуют BounceConst.java)
 #define SPLASH_NAME_NOKIA     "icons/nokiagames.png"    // Nokia Games splash
+#ifdef BOUNCE_NX
+#define SPLASH_NAME_BOUNCE    "icons/nx/bounce-splash.png"
+#else
 #define SPLASH_NAME_BOUNCE    "icons/bouncesplash.png"  // Bounce splash
+#endif
 
 // Звуковые файлы (соответствуют BounceConst.java)
 #define SOUND_HOOP_NAME       "sounds/up.ott"     // Звук сбора кольца
@@ -129,7 +133,11 @@ typedef uint8_t MoveMask;
 
 // Размеры игрового поля
 #define SCREEN_WIDTH 480
+#ifdef BOUNCE_NX
+#define SCREEN_HEIGHT 270
+#else
 #define SCREEN_HEIGHT 272
+#endif
 
 // Игровые ограничения
 #define MAX_LEVEL 11            // Максимальный номер уровня

@@ -6,3 +6,7 @@ PlayStation Vita platform integration, updated controls, save handling, audio in
 
 Bounce and its original game materials are trademarks or copyrighted works of their respective owners. They are not covered by the source-code license and are included only for preservation, research, and non-commercial fan-development purposes.
 
+Nintendo Switch integration and Bounce NX presentation changes: M-Essa11.
+Uphill ramp and reverse-gravity collision fixes: Super-Matter, from
+https://github.com/M-Essa11/Bounce-Vita/pull/1 (original commit 13e5705).
+

@@ -75,7 +75,10 @@ static int s_currentCameraY = CAMERA_UNINITIALIZED;
 
 // HUD размеры
 #define HUD_HEIGHT 24
-#ifdef BOUNCE_VITA
+#ifdef BOUNCE_NX
+#define GAME_VIEW_WIDTH 320
+#define GAME_VIEW_HEIGHT 180
+#elif defined(BOUNCE_VITA)
 #define GAME_VIEW_WIDTH 320
 #define GAME_VIEW_HEIGHT 181
 #else
@@ -186,6 +189,9 @@ void game_reset_camera(void) {
 void game_init(void) {
     SaveData *save = save_get_data();
     g_game.state = STATE_SPLASH_NOKIA;
+#ifdef BOUNCE_NX
+    g_game.state = STATE_SPLASH;
+#endif
     g_game.menu_selection = 0;
     g_game.selected_level = save->has_continue ? save->current_level : 1;
     

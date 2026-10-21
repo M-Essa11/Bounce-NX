@@ -62,7 +62,7 @@ void level_flush_ring_foreground(void);
 
 /* --- Resource paths (following Java BounceConst pattern) --- */
 #define TILESET_PATH          "icons/objects_nm.png"  // Основной атлас тайлов
-#ifdef BOUNCE_VITA
+#if defined(BOUNCE_VITA) || defined(BOUNCE_NX)
 #define TILESET_HD_PATH       "icons/hd/objects_hd.png"
 #endif
 

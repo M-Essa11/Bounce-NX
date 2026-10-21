@@ -1,83 +1,80 @@
-# Bounce Vita
+# Bounce NX
 
-Bounce Vita is a native PlayStation Vita port of the classic Nokia Bounce game. It is based on the open-source C reimplementation from [amdray/bounce_zero](https://github.com/amdray/bounce_zero), adapted for VitaSDK with Vita2D rendering, Vita controls, audio, persistent progress, and refreshed presentation assets.
+Bounce for Nintendo Switch, ported from [Bounce Vita](https://github.com/M-Essa11/Bounce-Vita).
+All 11 classic levels, updated artwork, sound effects, and saved progress.
 
-## Screenshots
+![Bounce](icons/nx/bounce-splash.png)
 
-### Main Menu
+## Install
 
-![Bounce Vita main menu](docs/screenshots/vita/menu.png)
+1. Download the ZIP from [Releases](https://github.com/M-Essa11/Bounce-NX/releases).
+2. Extract it onto the root of your microSD card.
+3. Open **Bounce NX** in the Homebrew Menu. Hold **R** while starting a game to open it in application mode.
 
-### Gameplay
+The game goes here:
 
-![Bounce Vita first level](docs/screenshots/vita/level-1.png)
+```
+sd:/switch/bounce-nx/bounce-nx.nro
+```
 
-![Bounce Vita gameplay](docs/screenshots/vita/gameplay.png)
-
-## Features
-
-- Native PlayStation Vita VPK
-- Vita2D hardware-accelerated rendering
-- All 11 classic levels
-- Music and sound effects
-- Persistent level, score, and lives
-- Refreshed ball, obstacle, HUD, menu, splash, and LiveArea graphics
-- English and original game localization data
+Updating? Replace the NRO. Keep your `save.dat`.
 
 ## Controls
 
-| Control | Action |
+| Button | Action |
 | --- | --- |
-| D-pad / Left stick | Move and navigate |
-| Cross | Jump / confirm |
-| Circle | Back |
-| Start | Pause |
-| L trigger | Move left |
-| R trigger | Move right |
-| Square + Triangle | Toggle invincibility cheat |
+| D-pad / left stick | Move and navigate |
+| A | Jump / confirm |
+| B | Back |
+| + | Start / pause to menu |
+| - | Save and exit |
+| L / ZL | Move left |
+| R / ZR | Move right |
+| X + Y | Toggle invincibility |
 
-## Save Data
+Saves are stored in `sd:/switch/bounce-nx/save.dat`. Continue keeps your level,
+score and lives. After closing the app, it restarts that level from the beginning.
 
-Progress is stored at:
+## v0.1.2 — ramp fixes
 
-```text
-ux0:data/BounceVita/save.dat
-```
+Added [Super-Matter's physics fixes](https://github.com/M-Essa11/Bounce-Vita/pull/1):
 
+- The ball keeps its speed while travelling uphill on ramps.
+- Airborne impacts still bounce correctly off normal and rubber ramps.
+- Floor and ceiling collisions work correctly when gravity is reversed.
 
-## Building
+Menus, movement and sound have been tested on Switch Lite. The new physics changes
+pass the desktop regression tests and still need a run on the Switch.
 
-Install [VitaSDK](https://vitasdk.org/) and its Vita2D dependency, then export `VITASDK` and add its tools to `PATH`.
+This also includes the fullscreen menus, readable text, HD ball logo and new cover
+from the previous test build.
 
-On Ubuntu or WSL:
+## Build
+
+Install devkitPro and its Switch tools. In the devkitPro MSYS2 shell:
 
 ```sh
-export VITASDK="$HOME/vitasdk"
-export PATH="$VITASDK/bin:$PATH"
-./build-vita.sh
+pacman -S --needed switch-dev switch-sdl2 switch-sdl2_image
+cd /c/Projects/Bounce-NX
+bash build-nx.sh
 ```
 
-The package is created at:
+Use a folder without spaces. The output is `bounce-nx.nro`, with the game data
+bundled inside. Python 3 can create the release ZIP with `python tools/package_nx.py`.
 
-```text
-build-vita/bounce_zero_vita.vpk
-```
+Desktop regression tests use host GCC: `bash test-nx-host.sh` after preparing the
+assets with `bash build-nx.sh` or `python tools/prepare_nx.py`.
 
-## Installation
-
-Transfer `bounce_zero_vita.vpk` to a homebrew-enabled PlayStation Vita and install it with VitaShell.
+If the game fails to start, check `sd:/switch/bounce-nx/bounce-nx.log`.
+The original Vita build instructions are in [README-Vita.md](README-Vita.md).
 
 ## Credits
 
-- Original Bounce game: Nokia / Sun Microsystems
-- Original C reimplementation: [amdray/bounce_zero](https://github.com/amdray/bounce_zero)
-- PlayStation Vita port and presentation updates: [M-Essa11](https://github.com/M-Essa11)
-- VitaSDK and Vita2D contributors
+- Nokia / Sun Microsystems — original Bounce.
+- [amdray/bounce_zero](https://github.com/amdray/bounce_zero) — C reimplementation.
+- M-Essa11 — Vita and Switch ports, artwork and presentation updates.
+- [Super-Matter](https://github.com/Super-Matter) — ramp and reverse-gravity physics fixes.
+- devkitPro, libnx and SDL contributors — tools and libraries.
 
-## Support
-
-If you enjoy the project and want to support its development, visit [Ko-fi.com/essa11](https://ko-fi.com/essa11).
-
-## Legal
-
-The source code is available under the MIT License; see `LICENSE`. Bounce names, characters, and original game assets remain the property of their respective owners. This fan project is not affiliated with or endorsed by Nokia, Sun Microsystems, Sony, or PlayStation.
+Source code: MIT. Original game names and assets belong to their respective owners.
+See [LICENSE](LICENSE) and [NOTICE.md](NOTICE.md).

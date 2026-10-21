@@ -3,7 +3,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
-#ifdef BOUNCE_VITA
+#ifdef BOUNCE_NX
+#include <SDL2/SDL.h>
+static SDL_AudioDeviceID g_nx_audio_device;
+static int g_nx_volume = 0x6000;
+#elif defined(BOUNCE_VITA)
 #include <malloc.h>
 #include <psp2/audioout.h>
 #include <psp2/kernel/threadmgr.h>
@@ -282,7 +286,10 @@ void ott_player_init(struct ott_player_t *player, struct ott_info_t *ott_info) {
 
 // Start playing OTT - с защитой от race conditions
 void ott_player_start(struct ott_player_t *player) {
-#ifdef BOUNCE_VITA
+#ifdef BOUNCE_NX
+    if (g_nx_audio_device) SDL_LockAudioDevice(g_nx_audio_device);
+    player->is_playing = 0;
+#elif defined(BOUNCE_VITA)
     player->is_playing = 0;
     __sync_synchronize();
 #else
@@ -307,7 +314,9 @@ void ott_player_start(struct ott_player_t *player) {
     // Устанавливаем флаг воспроизведения последним (после всех полей)
     player->is_playing = 1;
 
-#ifdef BOUNCE_VITA
+#ifdef BOUNCE_NX
+    if (g_nx_audio_device) SDL_UnlockAudioDevice(g_nx_audio_device);
+#elif defined(BOUNCE_VITA)
     __sync_synchronize();
 #else
     sceKernelCpuResumeIntr(intr);
@@ -316,8 +325,14 @@ void ott_player_start(struct ott_player_t *player) {
 
 // Stop playing OTT - с защитой от race conditions  
 void ott_player_stop(struct ott_player_t *player) {
+#ifdef BOUNCE_NX
+    if (g_nx_audio_device) SDL_LockAudioDevice(g_nx_audio_device);
+#endif
     // Простая атомарная операция - достаточно флага
     player->is_playing = 0;
+#ifdef BOUNCE_NX
+    if (g_nx_audio_device) SDL_UnlockAudioDevice(g_nx_audio_device);
+#endif
 }
 
 // Генерация сэмпла от одного плеера - с огибающей для устранения щелчков
@@ -416,7 +431,15 @@ void ott_audio_callback(void* buf, unsigned int length, void *userdata) {
     }
 }
 
-#ifdef BOUNCE_VITA
+#ifdef BOUNCE_NX
+static void nx_audio_callback(void *userdata, Uint8 *stream, int len) {
+    memset(stream, 0, (size_t)len);
+    ott_audio_callback(stream, (unsigned int)len / sizeof(psp_sample_t), userdata);
+    short *samples = (short *)stream;
+    for (int i = 0; i < len / (int)sizeof(short); ++i)
+        samples[i] = (short)((int)samples[i] * g_nx_volume / 0x8000);
+}
+#elif defined(BOUNCE_VITA)
 static int vita_audio_thread(SceSize args, void *argp) {
     const unsigned int sample_count = 1024;
     psp_sample_t *samples = memalign(64, sample_count * sizeof(*samples));
@@ -448,7 +471,9 @@ int sound_init(void) {
         return 1; // Уже инициализирована
     }
     
-#ifdef BOUNCE_VITA
+#ifdef BOUNCE_NX
+    /* Open the device only after sounds and player state are ready below. */
+#elif defined(BOUNCE_VITA)
     g_audio_port = sceAudioOutOpenPort(SCE_AUDIO_OUT_PORT_TYPE_BGM, 1024, PSP_SR,
         SCE_AUDIO_OUT_MODE_STEREO);
     if (g_audio_port < 0) return 10;
@@ -505,7 +530,17 @@ int sound_init(void) {
     ott_player_init(&g_pickup_player, &g_pickup_sound);
     ott_player_init(&g_pop_player, &g_pop_sound);
     
-#ifdef BOUNCE_VITA
+#ifdef BOUNCE_NX
+    SDL_AudioSpec desired = {0};
+    desired.freq = PSP_SR;
+    desired.format = AUDIO_S16SYS;
+    desired.channels = 2;
+    desired.samples = 1024;
+    desired.callback = nx_audio_callback;
+    g_nx_audio_device = SDL_OpenAudioDevice(NULL, 0, &desired, NULL, 0);
+    if (!g_nx_audio_device) return 10;
+    SDL_PauseAudioDevice(g_nx_audio_device, 0);
+#elif defined(BOUNCE_VITA)
     {
         int volumes[2] = {g_audio_volume, g_audio_volume};
         sceAudioOutSetVolume(g_audio_port,
@@ -541,12 +576,19 @@ int sound_init(void) {
 // Завершение работы аудио системы
 void sound_shutdown(void) {
     if (g_sound_initialized) {
+#ifdef BOUNCE_NX
+        SDL_PauseAudioDevice(g_nx_audio_device, 1);
+        SDL_CloseAudioDevice(g_nx_audio_device);
+        g_nx_audio_device = 0;
+#endif
         // Останавливаем все плееры
         ott_player_stop(&g_hoop_player);
         ott_player_stop(&g_pickup_player);
         ott_player_stop(&g_pop_player);
         
-#ifdef BOUNCE_VITA
+#ifdef BOUNCE_NX
+        /* SDL device has been closed before stopping the players. */
+#elif defined(BOUNCE_VITA)
         g_audio_running = 0;
         if (g_audio_thread >= 0) {
             sceKernelWaitThreadEnd(g_audio_thread, NULL, NULL);
@@ -597,7 +639,11 @@ void sound_set_volume(int volume) {
         if (volume < 0) volume = 0;
         if (volume > 0x8000) volume = 0x8000;
         
-#ifdef BOUNCE_VITA
+#ifdef BOUNCE_NX
+        SDL_LockAudioDevice(g_nx_audio_device);
+        g_nx_volume = volume;
+        SDL_UnlockAudioDevice(g_nx_audio_device);
+#elif defined(BOUNCE_VITA)
         int volumes[2] = {volume, volume};
         g_audio_volume = volume;
         sceAudioOutSetVolume(g_audio_port,

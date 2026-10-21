@@ -14,6 +14,10 @@
 
 // Нужен доступ к глобальному состоянию игры
 extern Game g_game;
+#ifdef BOUNCE_NX
+static texture_t *s_nx_ball_logo;
+#define NX_MENU_BACKGROUND 0xFF38251B
+#endif
 
 // Перечисление пунктов меню для безопасности типов
 typedef enum {
@@ -193,6 +197,10 @@ static ModalPanel draw_modal_panel(u32 background_color, u32 panel_color, const 
 
     panel.w = 240;
     panel.h = 128;
+#ifdef BOUNCE_NX
+    panel.w = SCREEN_WIDTH - 40;
+    panel.h = SCREEN_HEIGHT - 64;
+#endif
     panel.x = (SCREEN_WIDTH - panel.w) / 2;
     panel.y = (SCREEN_HEIGHT - panel.h) / 2;
     panel.center_x = SCREEN_WIDTH / 2;
@@ -228,6 +236,9 @@ static void draw_modal_x_button(const ModalPanel* panel, const char* text, int y
 }
 
 void menu_init(void) {
+#ifdef BOUNCE_NX
+    s_nx_ball_logo = png_load_texture_vram("icons/nx/ball-logo.png");
+#endif
     // Инициализация меню (пока пустая)
 }
 
@@ -298,7 +309,10 @@ static void menu_render(void) {
     const int font_height = 23;
     const int   bg_height = MAIN_MENU_SELECTION_BG_HEIGHT;
 
-#ifdef BOUNCE_VITA
+#ifdef BOUNCE_NX
+    graphics_draw_rect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, NX_MENU_BACKGROUND);
+    graphics_draw_rect(0, 0, SCREEN_WIDTH, 3, COLOR_SELECTION_BG);
+#elif defined(BOUNCE_VITA)
     graphics_draw_rect(70, 35, 340, 210, 0xE8402818);
     graphics_draw_rect(70, 35, 340, 3, COLOR_SELECTION_BG);
 #endif
@@ -308,7 +322,16 @@ static void menu_render(void) {
         const char* title = local_get_text(QTJ_BOUN_GAME_NAME); // ID 10, как в оригинале BounceUI.java:65
         int w = graphics_measure_text(title, font_height);
         int x = center_x - (w / 2);
+#ifdef BOUNCE_NX
+        graphics_draw_text(x, title_y, title, COLOR_WHITE_ABGR, font_height);
+        if (s_nx_ball_logo) {
+            sprite_rect_t ball = png_create_sprite_rect(s_nx_ball_logo, 0, 0,
+                s_nx_ball_logo->actual_width, s_nx_ball_logo->actual_height);
+            png_draw_sprite(s_nx_ball_logo, &ball, x - 38, title_y - 7, 30, 30);
+        }
+#else
         graphics_draw_text(x, title_y, title, 0xFF40A0FF, font_height);
+#endif
 #ifdef BOUNCE_VITA
         {
             texture_t *tileset = level_get_tileset();
@@ -353,6 +376,9 @@ static void menu_render(void) {
     }
 
     // Будущие иконки меню
+#ifdef BOUNCE_NX
+    graphics_draw_text(102, 255, "A: Select   B: Back   -: Save and exit", COLOR_WHITE_ABGR, 9);
+#endif
     // graphics_begin_textured();
     // TODO: render menu icons here
 }
@@ -383,7 +409,11 @@ static void instructions_render(void) {
     // Индикатор страницы под белой панелью, по центру
     text_y = panel.y + panel.h + 10;  // 10px под панелью
     char page_info[64];
+#ifdef BOUNCE_NX
+    snprintf(page_info, sizeof(page_info), "Page %d of %d", current_instruction_page + 1, INSTRUCTIONS_TOTAL_PAGES);
+#else
     snprintf(page_info, sizeof(page_info), "Часть %d из %d", current_instruction_page + 1, INSTRUCTIONS_TOTAL_PAGES);
+#endif
     int page_w = graphics_measure_text(page_info, 9);
     graphics_draw_text(panel.center_x - (page_w / 2), text_y, page_info, COLOR_TEXT_NORMAL, 9);
 }
@@ -455,12 +485,21 @@ static void level_select_render(void) {
     
     // UI цифры из битмапа — без текстурной модуляции
     graphics_begin_plain();
+#ifdef BOUNCE_NX
+    graphics_draw_rect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, NX_MENU_BACKGROUND);
+    graphics_draw_rect(0, 0, SCREEN_WIDTH, 3, COLOR_SELECTION_BG);
+    graphics_draw_text(140, 245, "A: Play   B: Back", COLOR_WHITE_ABGR, 9);
+#endif
 // Заголовок
     {
         const char* title = local_text_select_level();
         int w = graphics_measure_text(title, 23);
         int x = center_x - (w / 2);
+#ifdef BOUNCE_NX
+        graphics_draw_text(x, LEVEL_SELECT_TITLE_Y, title, COLOR_WHITE_ABGR, 23);
+#else
         graphics_draw_text(x, LEVEL_SELECT_TITLE_Y, title, COLOR_TEXT_NORMAL, 23);
+#endif
     }
     
     // Размеры для сетки уровней
@@ -496,7 +535,11 @@ static void level_select_render(void) {
             char level_text[4];
             snprintf(level_text, sizeof(level_text), "%d", level);
 
+#ifdef BOUNCE_NX
+            u32 color = COLOR_WHITE_ABGR;
+#else
             u32 color = (level == g_game.selected_level) ? COLOR_TEXT_SELECTED : COLOR_TEXT_NORMAL;
+#endif
             graphics_draw_text(x, y, level_text, color, 23);
         }
     }
@@ -623,6 +666,10 @@ static void level_complete_render(void) {
 }
 
 void menu_cleanup(void) {
+#ifdef BOUNCE_NX
+    png_free_texture(s_nx_ball_logo);
+    s_nx_ball_logo = NULL;
+#endif
     // Очистка ресурсов меню (пока пустая)
 }
 
